@@ -1,10 +1,10 @@
 using Gtk;
 namespace  Vtodo_Window{
-  ApplicationWindow init(){
+  ApplicationWindow init_win(){
     ApplicationWindow window = null;
     try {
       // setting up window
-      window = builder_vtodo.init_builder().get_object("main_window") as ApplicationWindow;
+      window = builder_vtodo.init_main_win().get_object("main_window") as ApplicationWindow;
       window.destroy.connect (Gtk.main_quit);
 
       //setting up css 
@@ -15,7 +15,6 @@ namespace  Vtodo_Window{
     } catch (Error e) {
       print("%s\n", e.message);
     }
-
     return window;
   }
 }
