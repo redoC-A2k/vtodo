@@ -8,6 +8,8 @@ executable(
   'src'/'builder.vala',
   dependencies:[
     dependency('gtk+-3.0')
-    ],
-    install:false
+  ],
+  install:false,
+  link_args : '-C'
 )
+
