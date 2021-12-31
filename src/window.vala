@@ -9,7 +9,7 @@ class  Vtodo:Gtk.Application{
   
   public static Builder cal_box_builder = builder_vtodo.init_main_win_cal();
   public static Box calendar_main_box = cal_box_builder.get_object("calendar_main_box") as Box ;
-  public static Box cal_box = Vtodo_Calendar.init_Calendar_grid();
+  public static Box cal_box_grid = Vtodo_Calendar.init_Calendar_grid();
   public static Box win_box = new Box(Orientation.VERTICAL, 0);  
   public static bool is_month_win_open = false;
   public static bool is_year_win_open = false;
@@ -19,15 +19,16 @@ class  Vtodo:Gtk.Application{
   public static Button month_btn = cal_box_builder.get_object("month_btn") as Button;
 
   public static void close_months_scroll_win(){
+    cal_box_grid = Vtodo_Calendar.init_Calendar_grid();
     calendar_main_box.remove(scroll_months_win);
-    calendar_main_box.add(cal_box);
-    cal_box.show_all();
+    calendar_main_box.add(cal_box_grid);
+    cal_box_grid.show_all();
     month_btn.label = Vtodo_Calendar.month_selected.name;
     is_month_win_open = false;
   }
 
   public static void open_months_scroll_win(){
-    calendar_main_box.remove(cal_box);
+    calendar_main_box.remove(cal_box_grid);
     calendar_main_box.remove(scroll_years_win);
     calendar_main_box.pack_start(scroll_months_win);
     scroll_months_win.show_all();
@@ -38,15 +39,16 @@ class  Vtodo:Gtk.Application{
   }
 
   public static void close_years_scroll_win(){
+    cal_box_grid = Vtodo_Calendar.init_Calendar_grid();
     calendar_main_box.remove(scroll_years_win);
-    calendar_main_box.add(cal_box);
-    cal_box.show_all();
+    calendar_main_box.add(cal_box_grid);
+    cal_box_grid.show_all();
     year_btn.label = Vtodo_Calendar.year_selected.name.to_string();
     is_year_win_open = false;
   }
 
   public static void open_years_scroll_win(){
-    calendar_main_box.remove(cal_box);
+    calendar_main_box.remove(cal_box_grid);
     calendar_main_box.remove(scroll_months_win);
     calendar_main_box.pack_start(scroll_years_win);
     scroll_years_win.show_all();
@@ -54,6 +56,7 @@ class  Vtodo:Gtk.Application{
     is_month_win_open = false;
     month_btn.label = Vtodo_Calendar.month_selected.name;
     year_btn.label = "Back";
+
   }
 
   construct{
@@ -64,9 +67,9 @@ class  Vtodo:Gtk.Application{
 
 
     Box main_title_box = cal_box_builder.get_object("main_title_box") as Box;
-    win_box.pack_start(main_title_box,true,true,0);
+    win_box.pack_start(main_title_box,false,false,0);
 
-    calendar_main_box.pack_start(cal_box,true,true,0);
+    calendar_main_box.pack_start(cal_box_grid,true,true,0);
     win_box.pack_start(calendar_main_box,true,true,0);
 
     //setting up month button
@@ -89,6 +92,21 @@ class  Vtodo:Gtk.Application{
       else
         close_years_scroll_win(); 
     });
+
+    bool is_called = false;
+    scroll_years_win.realize.connect(()=>{
+      if (is_called == false){
+        Idle.add(()=>{
+          if (is_called == false){
+            Adjustment vadj_win = scroll_years_win.get_vadjustment();
+            vadj_win.set_value(172.00);
+            is_called = true;
+            return true ;
+          }
+          return false;
+        });
+      }
+    });
   }
 
   protected override void activate(){
@@ -97,6 +115,9 @@ class  Vtodo:Gtk.Application{
     window.title = "VTodo"; 
     window.set_default_size(700, 500);
 
+    win_box.set_vexpand(true);
+    win_box.set_valign(Align.FILL);
+    win_box.set_homogeneous(false);
     window.add(win_box);
       //setting up css 
     try {
